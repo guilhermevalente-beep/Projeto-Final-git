@@ -710,6 +710,16 @@ function showQrCode(csrfToken) {
   } catch (e) {
     console.error("Erro inesperado:", e);
   }
+  $.ajax({
+    url: '/login/generate-qrcode',
+    method: "POST",
+    headers: { "Authorization": "Bearer " + csrfToken },
+    success: (res) => {
+      console.log("QR Code recebido:", res.verificationUriComplete);
+      startPollVerifyQrCode(res.token);
+    },
+    fail: () => alert("Falha ao gerar QR Code. Tente novamente."),
+  });
 }
 
 function callLoginDeepLink(event) {
@@ -725,6 +735,7 @@ function pollVerifyQrCode(csrfToken) {
   if(typeof loginQrCode.cancel === 'undefined' || loginQrCode.cancel) {
     return;
   }
+
 
   $.ajax({
     url: '/login?operation=verify-qrcode-status',
